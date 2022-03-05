@@ -1,0 +1,28 @@
+#!/bin/bash
+
+insereRegras(){
+  echo "Inserindo regras..."
+
+  iptables -t filter -F INPUT
+  iptables -t filter -A INPUT -d 201.2.3.4 -p TCP -m multiport --dports 80,443 -j ACCEPT
+  iptables -t filter -A INPUT -d 201.2.3.4 -p TCP -m multiport --dports 20,21 -j ACCEPT
+  iptables -t filter -A INPUT -d 201.2.3.4 -p TCP --dport 22 -j ACCEPT
+  iptables -t filter -A INPUT -d 201.2.3.4 -p UDP --dport 53 -j ACCEPT
+  iptables -t filter -A INPUT -s 189.8.7.6 -d 201.2.3.4 -p TCP --dport 53 -j ACCEPT
+  iptables -t filter -A INPUT -d 201.2.3.4 -p TCP -m multiport --dports 25,587 -j ACCEPT
+  # LIBERA O MEU ACESSO
+  iptables -t filter -A INPUT -s 192.168.56.1 -p TCP --dport 22 -j ACCEPT
+  iptables -t filter -A INPUT -j DROP
+}
+
+apagaRegras(){
+  echo "Apagando regras..."
+  iptables -t filter -F INPUT
+}
+
+case $1 in
+        "start") insereRegras ;;
+        "stop") apagaRegras ;;
+        "restart") apagaRegras ; insereRegras ;;
+        *) echo "Uso: $0 <start|stop|restart>" ;;
+esac
